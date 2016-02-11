@@ -18,7 +18,15 @@ uis.directive('uiSelectChoices',
       if (!tAttrs.repeat) throw uiSelectMinErr('repeat', "Expected 'repeat' expression.");
 
       return function link(scope, element, attrs, $select, transcludeFn) {
-
+        
+        if(scope.choosenPaging!==undefined) {
+            element.bind('scroll', function () {
+                if (element[0].scrollTop + element[0].offsetHeight >= element[0].scrollHeight) {
+                    scope.choosenPaging();
+                }
+            });
+        }
+        
         // var repeat = RepeatParser.parse(attrs.repeat);
         var groupByExp = attrs.groupBy;
         var groupFilterExp = attrs.groupFilter;
@@ -55,6 +63,8 @@ uis.directive('uiSelectChoices',
           if(newValue && !$select.open && $select.multiple) $select.activate(false, true);
           $select.activeIndex = $select.tagging.isActivated ? -1 : 0;
           if (!attrs.minimumInputLength || $select.search.length >= attrs.minimumInputLength) {
+            if(scope.choosenSearchChange!==undefined)
+                scope.choosenSearchChange($select.search);
             $select.refresh(attrs.refresh);
           } else {
             $select.items = [];
